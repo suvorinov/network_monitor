@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8900:8900"
+    volumes:
+      - ./app:/app/app
+    environment:
+      - DB_PATH=${DB_PATH}
+      - SECRET_KEY=${SECRET_KEY}

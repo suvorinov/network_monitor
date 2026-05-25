@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Панель управления дашбордом -->
+<div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+    <h1 class="text-xl neon-text flex items-center whitespace-nowrap">
+        <i class="fa-solid fa-terminal mr-2"></i> root@monitor:~$ node_status
+        <span class="cursor-blink ml-1"></span>
+    </h1>
+    
+    <div class="flex items-center space-x-4 w-full md:w-auto">
+        <!-- Поиск -->
+        {% include "partials/_search_hostname.html" %}
+        
+        <!-- Фильтры статусов -->
+        {% include "partials/_statuses.html" %}
+    </div>
+</div>
+
+<!-- Сетка терминалов -->
+<!-- hx-vals задает дефолтные параметры для всех исходящих запросов этого элемента -->
+<div id="terminal-list" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
+     hx-get="/htmx/terminals" hx-trigger="load, every 10s" hx-swap="innerHTML"
+     hx-vals='{"view": "cli", "page": "1", "status": "ALL", "q": ""}'>
+    <div class="text-sm" style="color: var(--text-muted)">Инициализация сканера сети...</div>
+</div>
+
+<!-- Контейнер для пагинации -->
+<div id="pagination" class="mt-8 flex justify-center space-x-2"></div>
+
+<script>
+
+// Логика подсветки активного фильтра
+/*
+document.querySelectorAll('.status-filter').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.status-filter').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+    });
+});
+*/
+
+// Логика подсветки активного фильтра и сохранения состояния
+document.querySelectorAll('.status-filter').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // 1. Обновляем визуал
+        document.querySelectorAll('.status-filter').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // 2. КРИТИЧЕСКИ ВАЖНО: Обновляем hx-vals, чтобы автообновление (every 10s) 
+        // забирало текущий фильтр, а не сбрасывало на ALL
+        const list = document.getElementById('terminal-list');
+        let currentVals = htmx.values(list);
+        currentVals['status'] = this.dataset.filter;
+        currentVals['view'] = this.dataset.status;
+        console.log(currentVals);
+        list.setAttribute('hx-vals', JSON.stringify(currentVals));
+    });
+});
+
+/*
+// Восстанавливаем подсветку кнопок после перерисовки HTMX
+document.getElementById('terminal-list').addEventListener('htmx:afterSettle', function(event) {
+    // Читаем текущий активный фильтр из hx-vals
+    const list = document.getElementById('terminal-list');
+    let currentVals = htmx.values(list);
+    let activeFilter = currentVals['status'] || 'ALL';
+    
+    // Подсвечиваем нужную кнопку
+    document.querySelectorAll('.status-filter').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.filter === activeFilter) {
+            btn.classList.add('active');
+        }
+    });
+});
+*/
+</script>
+
+<style>
+/* Стили для активной кнопки фильтра */
+.status-filter.active {
+    background-color: var(--accent-green-dim);
+    color: white;
+}
+.status-filter {
+    background-color: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.status-filter:hover {
+    color: var(--text-main);
+}
+</style>
+
+{% endblock %}

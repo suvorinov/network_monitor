@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+pydantic-settings
+jinja2
+python-multipart
+aiofiles
+loguru
+apscheduler
+
+# For Agent
+requests
+psutil
+pyinstaller

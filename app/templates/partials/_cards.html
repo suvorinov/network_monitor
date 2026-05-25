@@ -1,0 +1,135 @@
+<div class="panel hover:border-green-500 transition-colors duration-300" style="overflow: hidden;">
+    
+    <div class="window-header">
+        <div class="window-dots">
+            <div class="window-dot dot-red"></div>
+            <div class="window-dot dot-yellow"></div>
+            <div class="window-dot dot-green"></div>
+        </div>
+        <div class="ml-auto text-xs font-bold" style="color: var(--text-muted);">{{ pc.hostname }}</div>
+        
+        <!-- КНОПКА ОТКРЫТИЯ КОНСОЛИ УПРАВЛЕНИЯ -->
+        {% if pc.status == 'ONLINE' %}
+        <button class="ml-2 px-1.5 py-0.5 rounded text-[10px] border transition-all hover:border-blue-400 hover:text-blue-400" 
+                style="border-color: var(--border-color); color: var(--text-muted);"
+                onclick="openCommandModal('{{ pc.hostname }}')"
+                title="Удаленное управление">
+            <i class="fa-solid fa-terminal"></i>
+        </button>
+        {% endif %}
+
+        <!-- Кнопка перезагрузки (только для Windows) -->
+        {% if pc.os_name == 'Windows' and pc.status == 'ONLINE' %}
+        <button class="ml-2 px-1.5 py-0.5 rounded text-[10px] border transition-all hover:border-red-500 hover:text-red-500" 
+                style="border-color: var(--border-color); color: var(--text-muted);"
+                hx-post="/api/computers/{{ pc.hostname }}/command?cmd=shutdown%20%2Fr%20%2Ft%205" 
+                hx-target="#toast-container" hx-swap="none"
+                hx-confirm="Вы уверены, что хотите перезагрузить этот ПК?">
+            <i class="fa-solid fa-power-off"></i>
+        </button>
+        {% endif %}
+
+        <!-- КНОПКА КОПИРОВАНИЯ RDP/SSH В ЗАГОЛОВКЕ -->
+        <button class="copy-btn ml-3 px-1.5 py-0.5 rounded text-[10px] border transition-all" 
+                style="border-color: var(--border-color); color: var(--text-muted);"
+                onclick="copyConnection('{{ pc.ip_address }}', '{{ pc.os_name }}', '{{ pc.current_user }}', this)"
+                title="Скопировать команду подключения">
+            <i class="fa-solid fa-copy"></i>
+        </button>
+    </div>
+
+    <div class="p-4 pt-10 text-xs space-y-3" style="font-family: var(--font-mono);">
+        <div class="flex justify-between items-center">
+            <span style="color: var(--text-muted);">[ {{ pc.last_seen.strftime('%H:%M:%S') if pc.last_seen else '--:--:--' }} ]</span>
+            <div class="flex items-center space-x-1 {{ 'glow-green' if pc.status == 'ONLINE' else 'glow-red' }}">
+                <i class="fa-solid fa-circle text-[6px]"></i>
+                <span class="font-bold">{{ pc.status }}</span>
+            </div>
+        </div>
+
+        <div class="border-t" style="border-color: var(--border-color);"></div>
+
+        <div>
+            <div class="flex justify-between mb-1">
+                <span style="color: var(--text-muted);"><i class="fa-solid fa-microchip w-4"></i> CPU</span>
+                <span class="{{ 'glow-red' if pc.cpu_percent > 80 else '' }}">{{ pc.cpu_percent }}%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-bar" style="width: {{ pc.cpu_percent }}%; background-color: {{ '#f85149' if pc.cpu_percent > 80 else 'var(--accent-green)' }};"></div>
+            </div>
+        </div>
+
+        <div>
+            <div class="flex justify-between mb-1">
+                <span style="color: var(--text-muted);"><i class="fa-solid fa-memory w-4"></i> RAM</span>
+                <span class="{{ 'glow-red' if pc.ram_percent > 80 else '' }}">{{ pc.ram_percent }}%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-bar" style="width: {{ pc.ram_percent }}%; background-color: {{ '#f85149' if pc.ram_percent > 80 else 'var(--neon_blue)' }};"></div>
+            </div>
+        </div>
+
+        <div>
+            <div class="flex justify-between mb-1">
+                <span style="color: var(--text-muted);"><i class="fa-solid fa-hard-drive w-4"></i> DISK</span>
+                <span class="{{ 'glow-red' if pc.disk_percent > 90 else '' }}">{{ pc.disk_percent }}%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-bar" style="width: {{ pc.disk_percent }}%; background-color: {{ '#f85149' if pc.disk_percent > 90 else 'var(--neon_yellow)' }};"></div>
+            </div>
+        </div>
+
+        <!-- Блок системной информации -->
+        <div class="border-t mt-3 pt-3" style="border-color: var(--border-color);">
+            <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
+                <div style="color: var(--text-muted);">
+                    <i class="fa-solid fa-user w-4 text-center"></i> 
+                    <span class="glow-blue">{{ pc.current_user }}</span>
+                </div>
+                <div style="color: var(--text-muted);">
+                    <i class="fa-solid fa-clock w-4 text-center"></i> 
+                    <span style="color: var(--text-main);">{{ pc.uptime_formatted }}</span>
+                </div>
+                <div style="color: var(--text-muted);">
+                    <i class="fa-solid fa-window-maximize w-4 text-center"></i> 
+                    <span style="color: var(--text-main);">{{ pc.os_name }}</span>
+                </div>
+                <div style="color: var(--text-muted);">
+                    <i class="fa-solid fa-memory w-4 text-center"></i> 
+                    <span style="color: var(--text-main); {{ 'color: #f85149;' if pc.swap_percent > 80 else '' }}">Swap: {{ pc.swap_percent }}%</span>
+                </div>
+                <div style="color: var(--text-muted);">
+                    <i class="fa-solid fa-hard-drive w-4 text-center"></i> 
+                    <span style="color: var(--text-main);">{{ pc.disk_free_gb }} / {{ pc.disk_total_gb }} Gb</span>
+                </div>
+                <div style="color: var(--text-muted);">
+                    <i class="fa-solid fa-microchip w-4 text-center"></i> 
+                    <span style="color: var(--text-main);">Procs: {{ pc.process_count }}</span>
+                </div>
+                
+                <!-- СТРОКА С IP И ВТОРОЙ КНОПКОЙ КОПИРОВАНИЯ -->
+                <div class="col-span-2 flex items-center justify-between" style="color: var(--text-muted);">
+                    <div class="flex items-center">
+                        <i class="fa-solid fa-network-wired w-4 text-center"></i> 
+                        <span class="ml-1" style="color: var(--text-main);">{{ pc.ip_address or 'N/A' }}</span>
+                    </div>
+                    <button class="copy-btn px-1.5 py-0.5 rounded text-[10px] border transition-all" 
+                            style="border-color: var(--border-color); color: var(--text-muted);"
+                            onclick="copyConnection('{{ pc.ip_address }}', '{{ pc.os_name }}', '{{ pc.current_user }}', this)"
+                            title="Скопировать команду подключения">
+                        <i class="fa-solid fa-terminal mr-1"></i>RDP/SSH
+                    </button>
+                </div>
+
+                <div class="col-span-2" style="color: var(--text-muted);">
+                    <i class="fa-solid fa-right-left w-4 text-center"></i> 
+                    <span style="color: var(--text-main);">
+                        ↓ {{ pc.net_down_formatted }} 
+                        ↑ {{ pc.net_up_formatted }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

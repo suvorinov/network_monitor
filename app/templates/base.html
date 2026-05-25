@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberMonitor // Terminal</title>
+
+    <!-- TailwindCSS (оставляем только для утилитарных классов сетки и отступов) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Наш кастомный CyberTerminal CSS -->
+    <link rel="stylesheet" href="/static/css/styles_cyberterminal.css">
+    
+    <script>
+        tailwind.config = {
+            corePlugins: {
+                // Отключаем цветовые классы Tailwind, чтобы они не конфликтовали с нашими CSS-переменными
+                colors: false,
+                backgroundColor: false,
+                borderColor: false
+            }
+        }
+    </script>
+</head>
+<body class="h-full flex flex-col">
+    
+    <!-- Шапка системы (использует nav-terminal) -->
+    <header class="nav-terminal">
+        <div class="flex items-center space-x-3 neon-text">
+            <i class="fa-solid fa-shield-halved text-xl"></i>
+            <span class="font-bold tracking-widest uppercase">Cyber_Monitor</span>
+            <span class="text-xs" style="color: var(--text-muted)">v1.0</span>
+        </div>
+        <div class="text-xs flex items-center space-x-4" style="color: var(--text-muted)">
+            <span><i class="fa-solid fa-network-wired"></i> LOCAL_NET</span>
+            <span>// <span id="current-time"></span></span>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Боковая панель навигации -->
+        {% include "partials/_sidebar.html" %}
+
+        <!-- Основной контент -->
+        <main class="flex-1 p-6 overflow-y-auto">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Скрипт для часов -->
+    <script>
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('ru-RU');
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+
+    <!-- Page-specific scripts -->
+    {% block page_scripts %}{% endblock %}
+
+    <!-- Модальное окно выполнения команд (CyberTerminal) -->
+    <div id="command-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background-color: rgba(0,0,0,0.7); backdrop-filter: blur(4px);">
+        <div class="panel w-full max-w-lg" style="border: 1px solid var(--accent-green-dim); box-shadow: 0 0 20px rgba(63, 185, 80, 0.2);">
+            <!-- Заголовок модалки -->
+            <div class="window-header">
+                <div class="window-dots">
+                    <div class="window-dot dot-red cursor-pointer" onclick="closeCommandModal()"></div>
+                    <div class="window-dot dot-yellow"></div>
+                    <div class="window-dot dot-green"></div>
+                </div>
+                <div class="ml-auto text-xs font-bold glow-green" id="modal-hostname">HOSTNAME</div>
+            </div>
+
+            <!-- Тело модалки -->
+            <div class="p-6 text-xs space-y-4 my-4" style="font-family: var(--font-mono);">
+                <!-- Быстрые действия -->
+                <div class="flex space-x-2">
+                    <button class="btn-terminal text-[10px] py-1 px-2" onclick="setCommand('action:reboot')">
+                        <i class="fa-solid fa-power-off mr-1"></i> Reboot
+                    </button>
+                    <button class="btn-terminal text-[10px] py-1 px-2" onclick="setCommand('shell:gpupdate /force')">
+                        <i class="fa-solid fa-rotate mr-1"></i> GPUpdate
+                    </button>
+                    <button class="btn-terminal text-[10px] py-1 px-2" onclick="setCommand('shell:ipconfig /flushdns')">
+                        <i class="fa-solid fa-network-wired mr-1"></i> Flush DNS
+                    </button>
+                </div>
+
+                <!-- Инпут ввода команды -->
+                <div class="">
+                    <label class="block mb-1 uppercase tracking-wider" style="color: var(--text-muted); font-size: 10px;">Введите команду</label>
+                    <input type="text" id="command-input" class="input-terminal" placeholder="shell:whoami / action:reboot" 
+                           onkeydown="if(event.key === 'Enter') sendCommand()">
+                </div>
+
+                <!-- Кнопка отправки -->
+                <div class="flex justify-end">
+                    <button class="btn-terminal" onclick="sendCommand()">
+                        <i class="fa-solid fa-paper-plane mr-2"></i> Execute
+                    </button>
+                </div>
+
+                <!-- Блок вывода результата (появляется после выполнения) -->
+                <div id="command-result-block" class="hidden">
+                    <div class="uppercase tracking-wider mb-1" style="color: var(--text-muted); font-size: 10px;">Результат (после следующего пинга агента):</div>
+                    <div class="p-3 rounded text-[11px] whitespace-pre-wrap overflow-x-auto" 
+                         style="background-color: var(--bg-terminal); border: 1px solid var(--border-color); color: var(--accent-green); min-height: 50px; max-height: 200px;"
+                         id="command-result-text">
+                        Waiting for agent response...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Модальное окно детальной карточки хоста -->
+    <div id="host-modal" class="fixed inset-0 z-40 items-center hidden justify-center p-4" style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px);">
+        <!-- Сюда HTMX загрузит карточку -->
+        <div id="host-modal-content" hx-get="" hx-trigger="none"></div>
+    </div>
+
+
+<!-- Core scripts -->
+<script src="/static/js/app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+<div id="filters">
+        <div class="flex border rounded" style="border-color: var(--border-color)">
+        <button class="px-3 py-2 text-xs font-bold status-filter active" data-filter="ALL" 
+                hx-get="/htmx/terminals" hx-target="#terminal-list" hx-vals='{"status": "ALL"}'>ALL</button>
+        <button class="px-3 py-2 text-xs font-bold status-filter" data-filter="ONLINE" 
+                hx-get="/htmx/terminals" hx-target="#terminal-list" hx-vals='{"status": "ONLINE"}'>ONLINE</button>
+        <button class="px-3 py-2 text-xs font-bold status-filter" data-filter="OFFLINE" 
+                hx-get="/htmx/terminals" hx-target="#terminal-list" hx-vals='{"status": "OFFLINE"}'>OFFLINE</button>
+        </div>
+</div>
