@@ -87,8 +87,7 @@ def check_single_instance():
 def get_system_metrics():
     """Собирает расширенные метрики системы."""
     try:
-        hostname = socket.gethostname().split('.')[0]
-        
+        hostname = socket.gethostname().split('.')[0].lower()        
         ip_address = None
         addrs = psutil.net_if_addrs()
         for interface, addr_list in addrs.items():

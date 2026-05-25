@@ -3,5 +3,6 @@
     <input type="text" id="search-input" placeholder="Search hostname..." 
             class="input-terminal pl-10 w-full"
             hx-get="/htmx/terminals" hx-target="#terminal-list" hx-trigger="keyup changed delay:300ms" 
+            hx-indicator="#loading-spinner"
             name="q">
 </div>

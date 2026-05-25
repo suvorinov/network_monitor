@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi import Query
-from datetime import datetime
 from loguru import logger
 
 from app.models import Computer
@@ -34,7 +33,6 @@ async def htmx_terminals(
     q: str = Query(None),
     status: str = Query("ALL"),
     page: int = Query(1),
-    view: str = Query("cli") # <--- Добавляем параметр вида
 ):
     limit = 18
     offset = (page - 1) * limit
@@ -78,7 +76,6 @@ async def htmx_terminals(
         "computers": formatted_computers, 
         "page": page, 
         "total_pages": (total_computers + limit - 1) // limit,
-        "view_type": view # <--- Передаем в шаблон
     }
     
     return templates.TemplateResponse(request, "partials/terminals.html", context)
@@ -86,7 +83,9 @@ async def htmx_terminals(
 @router.get("/htmx/host_card/{hostname}", response_class=HTMLResponse)
 async def get_host_card(request: Request, hostname: str, db: Session = Depends(get_db)):
     """Возвращает HTML-карточку детальной информации о хосте для модалки."""
+    hostname = hostname.lower()
     pc = db.query(Computer).filter(Computer.hostname == hostname).first()
+
     if not pc:
         return HTMLResponse("<div class='p-4 text-red-500'>Хост не найден</div>")
     
@@ -113,4 +112,4 @@ async def get_host_card(request: Request, hostname: str, db: Session = Depends(g
         }
     }
     logger.info(hostname)
-    return templates.TemplateResponse(request, "partials/host_card.html", context)
+    return templates.TemplateResponse(request, "partials/_card.html", context)

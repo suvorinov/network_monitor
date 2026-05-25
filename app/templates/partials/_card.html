@@ -2,40 +2,11 @@
     
     <div class="window-header">
         <div class="window-dots">
-            <div class="window-dot dot-red"></div>
+            <div class="window-dot dot-red cursor-pointer" onclick="App.closeHostModal()"></div>
             <div class="window-dot dot-yellow"></div>
             <div class="window-dot dot-green"></div>
         </div>
-        <div class="ml-auto text-xs font-bold" style="color: var(--text-muted);">{{ pc.hostname }}</div>
-        
-        <!-- КНОПКА ОТКРЫТИЯ КОНСОЛИ УПРАВЛЕНИЯ -->
-        {% if pc.status == 'ONLINE' %}
-        <button class="ml-2 px-1.5 py-0.5 rounded text-[10px] border transition-all hover:border-blue-400 hover:text-blue-400" 
-                style="border-color: var(--border-color); color: var(--text-muted);"
-                onclick="openCommandModal('{{ pc.hostname }}')"
-                title="Удаленное управление">
-            <i class="fa-solid fa-terminal"></i>
-        </button>
-        {% endif %}
-
-        <!-- Кнопка перезагрузки (только для Windows) -->
-        {% if pc.os_name == 'Windows' and pc.status == 'ONLINE' %}
-        <button class="ml-2 px-1.5 py-0.5 rounded text-[10px] border transition-all hover:border-red-500 hover:text-red-500" 
-                style="border-color: var(--border-color); color: var(--text-muted);"
-                hx-post="/api/computers/{{ pc.hostname }}/command?cmd=shutdown%20%2Fr%20%2Ft%205" 
-                hx-target="#toast-container" hx-swap="none"
-                hx-confirm="Вы уверены, что хотите перезагрузить этот ПК?">
-            <i class="fa-solid fa-power-off"></i>
-        </button>
-        {% endif %}
-
-        <!-- КНОПКА КОПИРОВАНИЯ RDP/SSH В ЗАГОЛОВКЕ -->
-        <button class="copy-btn ml-3 px-1.5 py-0.5 rounded text-[10px] border transition-all" 
-                style="border-color: var(--border-color); color: var(--text-muted);"
-                onclick="copyConnection('{{ pc.ip_address }}', '{{ pc.os_name }}', '{{ pc.current_user }}', this)"
-                title="Скопировать команду подключения">
-            <i class="fa-solid fa-copy"></i>
-        </button>
+        <div class="ml-auto text-xs font-bold" style="color: var(--text-muted);">{{ pc.hostname }}</div>        
     </div>
 
     <div class="p-4 pt-10 text-xs space-y-3" style="font-family: var(--font-mono);">
@@ -113,12 +84,6 @@
                         <i class="fa-solid fa-network-wired w-4 text-center"></i> 
                         <span class="ml-1" style="color: var(--text-main);">{{ pc.ip_address or 'N/A' }}</span>
                     </div>
-                    <button class="copy-btn px-1.5 py-0.5 rounded text-[10px] border transition-all" 
-                            style="border-color: var(--border-color); color: var(--text-muted);"
-                            onclick="copyConnection('{{ pc.ip_address }}', '{{ pc.os_name }}', '{{ pc.current_user }}', this)"
-                            title="Скопировать команду подключения">
-                        <i class="fa-solid fa-terminal mr-1"></i>RDP/SSH
-                    </button>
                 </div>
 
                 <div class="col-span-2" style="color: var(--text-muted);">

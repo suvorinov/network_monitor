@@ -5,7 +5,9 @@
 help:
 	@echo "Доступные команды:"
 	@echo "  help          - Показать это сообщение"
-	@echo "  build         - Собрать образы"
+	@echo "  css           - Собрать TailwindCSS (input -> output)"
+	@echo "  css-watch     - Собрать TailwindCSS и следить за изменениями"
+	@echo "  build         - Собрать Docker-образы (включает css)"
 	@echo "  build-force   - Принудительно пересобрать образы"
 	@echo "  up            - Запустить сервисы в фоне"
 	@echo "  up-attach     - Запустить и остаться в терминале"
@@ -20,7 +22,13 @@ help:
 	@echo "  shell-root    - Зайти в контейнер как root"
 	@echo "  clean         - Удалить все неиспользуемые образы, сети, тома и т.д."
 
-build:
+css:
+	tailwindcss --input app/static/css/tailwind.css --output app/static/css/output.css --minify
+
+css-watch:
+	tailwindcss --input app/static/css/tailwind.css --output app/static/css/output.css --minify --watch
+
+build: css
 	docker-compose build
 
 build-force:

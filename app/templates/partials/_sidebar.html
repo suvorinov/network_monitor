@@ -15,13 +15,8 @@
                 <i class="fa-solid fa-desktop w-5 text-center"></i>
                 <span class="text-xs font-bold">Дашборд</span>
             </a>
-            <!-- Клик переключает на режим таблицы (CLI) -->
-            <a href="#" id="nav-nodes" onclick="setView('cli'); return false;" class="flex items-center space-x-3 rounded p-2 hover:bg-[rgba(255,255,255,0.05)] transition-colors" style="color: var(--text-muted);">
-                <i class="fa-solid fa-server w-5 text-center"></i>
-                <span class="text-xs">Узлы сети</span>
-            </a>
             <!-- Инциденты = Офлайн ПК -->
-            <a href="#" id="nav-incidents" onclick="filterOffline(); return false;" class="flex items-center space-x-3 rounded p-2 hover:bg-[rgba(255,255,255,0.05)] transition-colors" style="color: var(--text-muted);">
+            <a href="#" id="nav-incidents" onclick="App.filterOffline(); return false;" class="flex items-center space-x-3 rounded p-2 hover:bg-[rgba(255,255,255,0.05)] transition-colors" style="color: var(--text-muted);">
                 <i class="fa-solid fa-triangle-exclamation w-5 text-center"></i>
                 <span class="text-xs">Инциденты</span>
                 <!-- Динамический индикатор количества офлайн ПК -->
@@ -30,19 +25,7 @@
         </nav>
     </div>
 
-    <!-- 2. ИНСТРУМЕНТЫ -->
-    <div>
-        <div class="text-[10px] uppercase tracking-wider mb-2" style="color: var(--text-muted);">// Tools</div>
-        <nav class="flex flex-col space-y-1">
-            <!-- WoL пока заглушка, ждет реализации MAC-адресов -->
-            <button class="flex items-center space-x-3 rounded p-2 hover:bg-[rgba(0,255,157,0.1)] transition-colors w-full text-left opacity-50 cursor-not-allowed" style="color: var(--text-muted);" title="Требуется MAC-адрес (в разработке)">
-                <i class="fa-solid fa-bolt w-5 text-center" style="color: var(--neon_yellow);"></i>
-                <span class="text-xs">Wake-on-LAN</span>
-            </button>
-        </nav>
-    </div>
-
-    <!-- 3. СТАТУС СИСТЕМЫ (Внизу) -->
+    <!-- 2. СТАТУС СИСТЕМЫ (Внизу) -->
     <div class="mt-auto">
         <div class="text-[10px] uppercase tracking-wider mb-3" style="color: var(--text-muted);">// System Status</div>
         <div class="space-y-2 text-xs">
@@ -62,7 +45,7 @@
         
         <!-- Кнопка настроек -->
         <div class="mt-4 pt-4 border-t" style="border-color: var(--border-color);">
-            <a href="#" class="flex items-center space-x-3 rounded p-2 hover:bg-[rgba(255,255,255,0.05)] transition-colors" style="color: var(--text-muted);">
+            <a href="#" id="nav-settings" onclick="App.openSettingsModal(); return false;" class="flex items-center space-x-3 rounded p-2 hover:bg-[rgba(255,255,255,0.05)] transition-colors" style="color: var(--text-muted);">
                 <i class="fa-solid fa-gear w-5 text-center"></i>
                 <span class="text-xs">Настройки</span>
             </a>

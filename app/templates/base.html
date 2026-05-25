@@ -5,25 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CyberMonitor // Terminal</title>
 
-    <!-- TailwindCSS (оставляем только для утилитарных классов сетки и отступов) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- TailwindCSS (собрано локально) -->
+    <link rel="stylesheet" href="/static/css/output.css">
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Наш кастомный CyberTerminal CSS -->
     <link rel="stylesheet" href="/static/css/styles_cyberterminal.css">
-    
-    <script>
-        tailwind.config = {
-            corePlugins: {
-                // Отключаем цветовые классы Tailwind, чтобы они не конфликтовали с нашими CSS-переменными
-                colors: false,
-                backgroundColor: false,
-                borderColor: false
-            }
-        }
-    </script>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230a0a0f'/%3E%3Ctext x='1' y='12' font-family='monospace' font-size='12' font-weight='bold' fill='%2300ff9d'%3E%3E_%3C/text%3E%3C/svg%3E">
 </head>
 <body class="h-full flex flex-col">
     
@@ -50,26 +40,13 @@
         </main>
     </div>
 
-    <!-- Скрипт для часов -->
-    <script>
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('current-time').textContent = now.toLocaleTimeString('ru-RU');
-        }
-        setInterval(updateTime, 1000);
-        updateTime();
-    </script>
-
-    <!-- Page-specific scripts -->
-    {% block page_scripts %}{% endblock %}
-
     <!-- Модальное окно выполнения команд (CyberTerminal) -->
     <div id="command-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background-color: rgba(0,0,0,0.7); backdrop-filter: blur(4px);">
         <div class="panel w-full max-w-lg" style="border: 1px solid var(--accent-green-dim); box-shadow: 0 0 20px rgba(63, 185, 80, 0.2);">
             <!-- Заголовок модалки -->
             <div class="window-header">
                 <div class="window-dots">
-                    <div class="window-dot dot-red cursor-pointer" onclick="closeCommandModal()"></div>
+                    <div class="window-dot dot-red cursor-pointer" onclick="App.closeCommandModal()"></div>
                     <div class="window-dot dot-yellow"></div>
                     <div class="window-dot dot-green"></div>
                 </div>
@@ -80,13 +57,13 @@
             <div class="p-6 text-xs space-y-4 my-4" style="font-family: var(--font-mono);">
                 <!-- Быстрые действия -->
                 <div class="flex space-x-2">
-                    <button class="btn-terminal text-[10px] py-1 px-2" onclick="setCommand('action:reboot')">
+                    <button class="btn-terminal text-[10px] py-1 px-2" onclick="App.setCommand('action:reboot')">
                         <i class="fa-solid fa-power-off mr-1"></i> Reboot
                     </button>
-                    <button class="btn-terminal text-[10px] py-1 px-2" onclick="setCommand('shell:gpupdate /force')">
+                    <button class="btn-terminal text-[10px] py-1 px-2" onclick="App.setCommand('shell:gpupdate /force')">
                         <i class="fa-solid fa-rotate mr-1"></i> GPUpdate
                     </button>
-                    <button class="btn-terminal text-[10px] py-1 px-2" onclick="setCommand('shell:ipconfig /flushdns')">
+                    <button class="btn-terminal text-[10px] py-1 px-2" onclick="App.setCommand('shell:ipconfig /flushdns')">
                         <i class="fa-solid fa-network-wired mr-1"></i> Flush DNS
                     </button>
                 </div>
@@ -95,12 +72,12 @@
                 <div class="">
                     <label class="block mb-1 uppercase tracking-wider" style="color: var(--text-muted); font-size: 10px;">Введите команду</label>
                     <input type="text" id="command-input" class="input-terminal" placeholder="shell:whoami / action:reboot" 
-                           onkeydown="if(event.key === 'Enter') sendCommand()">
+                           onkeydown="if(event.key === 'Enter') App.sendCommand()">
                 </div>
 
                 <!-- Кнопка отправки -->
                 <div class="flex justify-end">
-                    <button class="btn-terminal" onclick="sendCommand()">
+                    <button class="btn-terminal" onclick="App.sendCommand()">
                         <i class="fa-solid fa-paper-plane mr-2"></i> Execute
                     </button>
                 </div>
@@ -125,6 +102,68 @@
         <div id="host-modal-content" hx-get="" hx-trigger="none"></div>
     </div>
 
+
+    <!-- Модальное окно настроек -->
+    <div id="settings-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background-color: rgba(0,0,0,0.7); backdrop-filter: blur(4px);">
+        <div class="panel w-full max-w-2xl" style="overflow: hidden;">
+            <div class="window-header">
+                <div class="window-dots">
+                    <div class="window-dot dot-red cursor-pointer" onclick="App.closeSettingsModal()"></div>
+                    <div class="window-dot dot-yellow"></div>
+                    <div class="window-dot dot-green"></div>
+                </div>
+                <div class="ml-auto text-xs font-bold" style="color: var(--text-muted);">SETTINGS</div>
+            </div>
+
+            <div class="p-6 pt-12 text-xs space-y-6" style="font-family: var(--font-mono);">
+                <!-- Тема -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-3">
+                        <i class="fa-solid fa-palette w-4 text-center" style="color: var(--text-muted);"></i>
+                        <span class="uppercase tracking-wider" style="color: var(--text-muted); font-size: 10px;">Тема оформления</span>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button id="theme-dark" class="btn-terminal flex-1 text-xs py-3" onclick="App.setTheme('dark')">
+                            <i class="fa-solid fa-moon mr-2"></i> Тёмная
+                        </button>
+                        <button id="theme-light" class="btn-terminal flex-1 text-xs py-3" onclick="App.setTheme('light')">
+                            <i class="fa-solid fa-sun mr-2"></i> Светлая
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Интервал обновления -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-3">
+                        <i class="fa-solid fa-rotate w-4 text-center" style="color: var(--text-muted);"></i>
+                        <span class="uppercase tracking-wider" style="color: var(--text-muted); font-size: 10px;">Интервал обновления</span>
+                    </div>
+                    <select id="polling-interval" class="input-terminal text-xs" onchange="App.setPollingInterval(parseInt(this.value))">
+                        <option value="5">5 секунд</option>
+                        <option value="10" selected>10 секунд</option>
+                        <option value="30">30 секунд</option>
+                        <option value="60">60 секунд</option>
+                    </select>
+                </div>
+
+                <!-- О системе -->
+                <div class="pt-4 border-t" style="border-color: var(--border-color);">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <i class="fa-solid fa-info-circle w-4 text-center" style="color: var(--text-muted);"></i>
+                        <span class="uppercase tracking-wider" style="color: var(--text-muted); font-size: 10px;">О системе</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-y-2 text-xs">
+                        <span style="color: var(--text-muted);">Версия</span>
+                        <span style="color: var(--text-main);">v1.0</span>
+                        <span style="color: var(--text-muted);">Движок</span>
+                        <span style="color: var(--text-main);">FastAPI + HTMX</span>
+                        <span style="color: var(--text-muted);">База данных</span>
+                        <span style="color: var(--text-main);">SQLite</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <!-- Core scripts -->
 <script src="/static/js/app.js"></script>

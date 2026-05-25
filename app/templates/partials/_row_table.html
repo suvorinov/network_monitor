@@ -9,7 +9,7 @@
     data-sort-disk="{{ pc.disk_percent }}" 
     data-sort-free="{{ pc.disk_free_gb }}" 
     data-sort-last_seen="{{ pc.last_seen.strftime('%Y-%m-%d %H:%M:%S') if pc.last_seen else '0000' }}"
-    onclick="openHostModal('{{ pc.hostname|lower }}')">
+    onclick="App.openHostModal('{{ pc.hostname|lower|e }}')">
 
     <!-- HOSTNAME -->
     <td class="text-left p-3 w-[15%] truncate font-bold" style="color: var(--accent-green);">

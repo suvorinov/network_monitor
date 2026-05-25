@@ -1,25 +1,66 @@
 # network_monitor
 
-## Описание
+Система мониторинга компьютерной сети. Сервер на FastAPI собирает метрики с агентов (CPU, RAM, disk, network) и отображает их в веб-дашборде.
 
-Это веб-приложение на FastAPI с использованием HTMX, TailwindCSS, FontAwesome и Docker.
+## Архитектура
 
-## Установка
+```
+network_monitor/
+├── app/                  # FastAPI-сервер
+│   ├── api/v1/routes/   # Эндпоинты (дашборд, приём метрик)
+│   ├── models/          # SQLAlchemy модель Computer
+│   ├── schemas/         # Pydantic схема AgentMetrics
+│   ├── templates/       # Jinja2 + HTMX шаблоны
+│   └── static/          # CSS, JS, шрифты
+├── agent/               # Агент для целевых машин (psutil + requests)
+└── docker-compose.yml   # Запуск сервера в Docker
+```
 
-1. Клонируйте репозиторий.
-2. Установите зависимости: `pip install -r requirements.txt`.
-3. Запустите сервер: `uvicorn app.main:app --reload`.
+## Быстрый старт
 
----
+```bash
+# 1. Установка зависимостей сервера
+pip install -r requirements.txt
 
-## network_monitor
+# 2. Сборка TailwindCSS (требуется ./tailwindcss)
+make css
 
-## Description
+# 3. Запуск сервера
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8900
+```
 
-This is a web application built on FastAPI using HTMX, TailwindCSS, FontAwesome, and Docker.
+## Запуск агента
 
-## Setup
+```bash
+# На целевой машине (требуется Python + psutil)
+python agent/agent.py
+```
 
-1. Clone the repository.
-2. Install dependencies: `pip install -r requirements.txt`.
-3. Run the server: `uvicorn app.main:app --reload`.
+Настройки агента — в `agent/config.ini` (URL сервера, интервал опроса).
+
+## Docker
+
+```bash
+make up       # Запуск в фоне
+make down     # Остановка
+make logs     # Просмотр логов
+make build    # Пересборка образа
+```
+
+## Makefile
+
+| Команда        | Назначение                              |
+|----------------|----------------------------------------|
+| `css`          | Собрать TailwindCSS                     |
+| `css-watch`    | Собрать TailwindCSS и следить           |
+| `build`        | Собрать Docker-образы (включает css)    |
+| `up` / `down`  | Запустить / остановить контейнеры       |
+| `logs`         | Показать логи контейнеров               |
+| `shell`        | Зайти в контейнер                       |
+
+## Технологии
+
+- **Backend**: FastAPI + SQLAlchemy + SQLite
+- **Frontend**: Jinja2 + HTMX + TailwindCSS + FontAwesome
+- **Агент**: psutil + requests + PyInstaller
+- **Инфраструктура**: Docker, docker-compose
