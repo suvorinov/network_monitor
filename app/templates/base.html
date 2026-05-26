@@ -14,17 +14,23 @@
     <!-- Наш кастомный CyberTerminal CSS -->
     <link rel="stylesheet" href="/static/css/styles_cyberterminal.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%230a0a0f'/%3E%3Ctext x='1' y='12' font-family='monospace' font-size='12' font-weight='bold' fill='%2300ff9d'%3E%3E_%3C/text%3E%3C/svg%3E">
+    <meta name="csrf-token" content="{{ csrf_token }}">
 </head>
 <body class="h-full flex flex-col">
+<noscript>
+    <div style="padding: 1rem; text-align: center; background: #f85149; color: white; font-family: monospace; font-size: 12px;">
+        ⚠ Для работы панели управления требуется JavaScript
+    </div>
+</noscript>
     
     <!-- Шапка системы (использует nav-terminal) -->
     <header class="nav-terminal">
         <div class="flex items-center space-x-3 neon-text">
             <i class="fa-solid fa-shield-halved text-xl"></i>
             <span class="font-bold tracking-widest uppercase">Cyber_Monitor</span>
-            <span class="text-xs" style="color: var(--text-muted)">v1.0</span>
+            <span class="text-xs text-muted">v1.0</span>
         </div>
-        <div class="text-xs flex items-center space-x-4" style="color: var(--text-muted)">
+        <div class="text-xs flex items-center space-x-4 text-muted">
             <span><i class="fa-solid fa-network-wired"></i> LOCAL_NET</span>
             <span>// <span id="current-time"></span></span>
         </div>
@@ -41,8 +47,8 @@
     </div>
 
     <!-- Модальное окно выполнения команд (CyberTerminal) -->
-    <div id="command-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background-color: rgba(0,0,0,0.7); backdrop-filter: blur(4px);">
-        <div class="panel w-full max-w-lg" style="border: 1px solid var(--accent-green-dim); box-shadow: 0 0 20px rgba(63, 185, 80, 0.2);">
+    <div id="command-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="panel w-full max-w-lg border-accent" style="box-shadow: 0 0 20px rgba(63, 185, 80, 0.2);">
             <!-- Заголовок модалки -->
             <div class="window-header">
                 <div class="window-dots">
@@ -54,7 +60,7 @@
             </div>
 
             <!-- Тело модалки -->
-            <div class="p-6 text-xs space-y-4 my-4" style="font-family: var(--font-mono);">
+            <div class="p-6 text-xs space-y-4 my-4 font-mono">
                 <!-- Быстрые действия -->
                 <div class="flex space-x-2">
                     <button class="btn-terminal text-[10px] py-1 px-2" onclick="App.setCommand('action:reboot')">
@@ -70,7 +76,7 @@
 
                 <!-- Инпут ввода команды -->
                 <div class="">
-                    <label class="block mb-1 uppercase tracking-wider" style="color: var(--text-muted); font-size: 10px;">Введите команду</label>
+                    <label class="block mb-1 uppercase tracking-wider text-muted text-[10px]">Введите команду</label>
                     <input type="text" id="command-input" class="input-terminal" placeholder="shell:whoami / action:reboot" 
                            onkeydown="if(event.key === 'Enter') App.sendCommand()">
                 </div>
@@ -84,9 +90,9 @@
 
                 <!-- Блок вывода результата (появляется после выполнения) -->
                 <div id="command-result-block" class="hidden">
-                    <div class="uppercase tracking-wider mb-1" style="color: var(--text-muted); font-size: 10px;">Результат (после следующего пинга агента):</div>
-                    <div class="p-3 rounded text-[11px] whitespace-pre-wrap overflow-x-auto" 
-                         style="background-color: var(--bg-terminal); border: 1px solid var(--border-color); color: var(--accent-green); min-height: 50px; max-height: 200px;"
+                    <div class="uppercase tracking-wider mb-1 text-muted text-[10px]">Результат (после следующего пинга агента):</div>
+                    <div class="p-3 rounded text-[11px] whitespace-pre-wrap overflow-x-auto text-accent bg-terminal border border-color"
+                         style="min-height: 50px; max-height: 200px;"
                          id="command-result-text">
                         Waiting for agent response...
                     </div>
@@ -97,30 +103,30 @@
 
 
     <!-- Модальное окно детальной карточки хоста -->
-    <div id="host-modal" class="fixed inset-0 z-40 items-center hidden justify-center p-4" style="background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px);">
+    <div id="host-modal" class="fixed inset-0 z-40 items-center hidden justify-center p-4 modal-backdrop" style="background-color: rgba(0,0,0,0.6);">
         <!-- Сюда HTMX загрузит карточку -->
         <div id="host-modal-content" hx-get="" hx-trigger="none"></div>
     </div>
 
 
     <!-- Модальное окно настроек -->
-    <div id="settings-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" style="background-color: rgba(0,0,0,0.7); backdrop-filter: blur(4px);">
-        <div class="panel w-full max-w-2xl" style="overflow: hidden;">
+    <div id="settings-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop">
+        <div class="panel w-full max-w-2xl overflow-hidden">
             <div class="window-header">
                 <div class="window-dots">
                     <div class="window-dot dot-red cursor-pointer" onclick="App.closeSettingsModal()"></div>
                     <div class="window-dot dot-yellow"></div>
                     <div class="window-dot dot-green"></div>
                 </div>
-                <div class="ml-auto text-xs font-bold" style="color: var(--text-muted);">SETTINGS</div>
+                <div class="ml-auto text-xs font-bold text-muted">SETTINGS</div>
             </div>
 
-            <div class="p-6 pt-12 text-xs space-y-6" style="font-family: var(--font-mono);">
+            <div class="p-6 pt-12 text-xs space-y-6 font-mono">
                 <!-- Тема -->
                 <div>
                     <div class="flex items-center space-x-2 mb-3">
-                        <i class="fa-solid fa-palette w-4 text-center" style="color: var(--text-muted);"></i>
-                        <span class="uppercase tracking-wider" style="color: var(--text-muted); font-size: 10px;">Тема оформления</span>
+                        <i class="fa-solid fa-palette w-4 text-center text-muted"></i>
+                        <span class="uppercase tracking-wider text-muted text-[10px]">Тема оформления</span>
                     </div>
                     <div class="flex space-x-3">
                         <button id="theme-dark" class="btn-terminal flex-1 text-xs py-3" onclick="App.setTheme('dark')">
@@ -135,8 +141,8 @@
                 <!-- Интервал обновления -->
                 <div>
                     <div class="flex items-center space-x-2 mb-3">
-                        <i class="fa-solid fa-rotate w-4 text-center" style="color: var(--text-muted);"></i>
-                        <span class="uppercase tracking-wider" style="color: var(--text-muted); font-size: 10px;">Интервал обновления</span>
+                        <i class="fa-solid fa-rotate w-4 text-center text-muted"></i>
+                        <span class="uppercase tracking-wider text-muted text-[10px]">Интервал обновления</span>
                     </div>
                     <select id="polling-interval" class="input-terminal text-xs" onchange="App.setPollingInterval(parseInt(this.value))">
                         <option value="5">5 секунд</option>
@@ -147,25 +153,29 @@
                 </div>
 
                 <!-- О системе -->
-                <div class="pt-4 border-t" style="border-color: var(--border-color);">
+                <div class="pt-4 border-t border-color">
                     <div class="flex items-center space-x-2 mb-3">
-                        <i class="fa-solid fa-info-circle w-4 text-center" style="color: var(--text-muted);"></i>
-                        <span class="uppercase tracking-wider" style="color: var(--text-muted); font-size: 10px;">О системе</span>
+                        <i class="fa-solid fa-info-circle w-4 text-center text-muted"></i>
+                        <span class="uppercase tracking-wider text-muted text-[10px]">О системе</span>
                     </div>
                     <div class="grid grid-cols-2 gap-y-2 text-xs">
-                        <span style="color: var(--text-muted);">Версия</span>
-                        <span style="color: var(--text-main);">v1.0</span>
-                        <span style="color: var(--text-muted);">Движок</span>
-                        <span style="color: var(--text-main);">FastAPI + HTMX</span>
-                        <span style="color: var(--text-muted);">База данных</span>
-                        <span style="color: var(--text-main);">SQLite</span>
+                        <span class="text-muted">Версия</span>
+                        <span class="text-main">v1.0</span>
+                        <span class="text-muted">Движок</span>
+                        <span class="text-main">FastAPI + HTMX</span>
+                        <span class="text-muted">База данных</span>
+                        <span class="text-main">SQLite</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-<!-- Core scripts -->
+<!-- Core scripts (порядок важен: core → utils → table → modals → app) -->
+<script src="/static/js/core.js"></script>
+<script src="/static/js/utils.js"></script>
+<script src="/static/js/table.js"></script>
+<script src="/static/js/modals.js"></script>
 <script src="/static/js/app.js"></script>
 
 </body>

@@ -1,6 +1,6 @@
 <!-- Row of table --> 
-<tr style="border-bottom: 1px solid var(--border-color); cursor: pointer;"
-    class="hover:bg-[rgba(0,255,157,0.05)] transition-colors"
+<tr class="border-bottom-terminal cursor-pointer hover:bg-[rgba(0,255,157,0.05)] transition-colors"
+    data-status="{{ pc.status }}" 
     data-sort-hostname="{{ pc.hostname|lower }}" 
     data-sort-user="{{ pc.current_user|lower }}" 
     data-sort-ip="{{ pc.ip_address|lower }}" 
@@ -12,7 +12,7 @@
     onclick="App.openHostModal('{{ pc.hostname|lower|e }}')">
 
     <!-- HOSTNAME -->
-    <td class="text-left p-3 w-[15%] truncate font-bold" style="color: var(--accent-green);">
+    <td class="text-left p-3 w-[15%] truncate font-bold text-accent">
         {{ pc.hostname }}
     </td>
     
@@ -22,7 +22,7 @@
     </td>
     
     <!-- IP ADDRESS -->
-    <td class="text-left p-3 w-[12%] truncate" style="color: var(--text-main);">
+    <td class="text-left p-3 w-[12%] truncate text-main">
         {{ pc.ip_address or 'N/A' }}
     </td>
     
@@ -37,40 +37,40 @@
     <!-- CPU -->
     <td class="text-right p-3 w-[12%]">
         <div class="inline-flex items-center justify-end space-x-1.5">
-            <div class="w-10 h-1.5 rounded-full flex-shrink-0" style="background-color: var(--bg-terminal);">
-                <div class="h-1.5 rounded-full" style="width: {{ pc.cpu_percent }}%; background-color: {{ '#f85149' if pc.cpu_percent > 80 else 'var(--accent-green)' }};"></div>
+            <div class="w-10 h-1.5 rounded-full flex-shrink-0 bg-terminal">
+                <div class="h-1.5 rounded-full" style="width: {{ pc.cpu_percent }}%; background-color: {{ '#f85149' if pc.cpu_percent > CPU_WARN else 'var(--accent-green)' }};"></div>
             </div>
-            <span class="w-9 text-right flex-shrink-0 {{ 'glow-red' if pc.cpu_percent > 80 else '' }}">{{ pc.cpu_percent }}%</span>
+            <span class="w-9 text-right flex-shrink-0 {{ 'glow-red' if pc.cpu_percent > CPU_WARN else '' }}">{{ pc.cpu_percent }}%</span>
         </div>
     </td>
     
     <!-- RAM -->
     <td class="text-right p-3 w-[12%]">
         <div class="inline-flex items-center justify-end space-x-1.5">
-            <div class="w-10 h-1.5 rounded-full flex-shrink-0" style="background-color: var(--bg-terminal);">
-                <div class="h-1.5 rounded-full" style="width: {{ pc.ram_percent }}%; background-color: {{ '#f85149' if pc.ram_percent > 80 else 'var(--neon_blue)' }};"></div>
+            <div class="w-10 h-1.5 rounded-full flex-shrink-0 bg-terminal">
+                <div class="h-1.5 rounded-full" style="width: {{ pc.ram_percent }}%; background-color: {{ '#f85149' if pc.ram_percent > RAM_WARN else 'var(--neon_blue)' }};"></div>
             </div>
-            <span class="w-9 text-right flex-shrink-0 {{ 'glow-red' if pc.ram_percent > 80 else '' }}">{{ pc.ram_percent }}%</span>
+            <span class="w-9 text-right flex-shrink-0 {{ 'glow-red' if pc.ram_percent > RAM_WARN else '' }}">{{ pc.ram_percent }}%</span>
         </div>
     </td>
     
     <!-- DISK -->
     <td class="text-right p-3 w-[12%]">
         <div class="inline-flex items-center justify-end space-x-1.5">
-            <div class="w-10 h-1.5 rounded-full flex-shrink-0" style="background-color: var(--bg-terminal);">
-                <div class="h-1.5 rounded-full" style="width: {{ pc.disk_percent }}%; background-color: {{ '#f85149' if pc.disk_percent > 90 else 'var(--neon_yellow)' }};"></div>
+            <div class="w-10 h-1.5 rounded-full flex-shrink-0 bg-terminal">
+                <div class="h-1.5 rounded-full" style="width: {{ pc.disk_percent }}%; background-color: {{ '#f85149' if pc.disk_percent > DISK_WARN else 'var(--neon_yellow)' }};"></div>
             </div>
-            <span class="w-9 text-right flex-shrink-0 {{ 'glow-red' if pc.disk_percent > 90 else '' }}">{{ pc.disk_percent }}%</span>
+            <span class="w-9 text-right flex-shrink-0 {{ 'glow-red' if pc.disk_percent > DISK_WARN else '' }}">{{ pc.disk_percent }}%</span>
         </div>
     </td>
     
     <!-- FREE DISK -->
-    <td class="text-right p-3 w-[8%]" style="color: var(--text-main);">
+    <td class="text-right p-3 w-[8%] text-main">
         {{ pc.disk_free_gb }} Gb
     </td>
     
     <!-- LAST SEEN -->
-    <td class="text-right p-3 w-[10%]" style="color: var(--text-muted);">
+    <td class="text-right p-3 w-[10%] text-muted">
         {{ pc.last_seen.strftime('%H:%M:%S') if pc.last_seen else '--:--:--' }}
     </td>
 </tr>

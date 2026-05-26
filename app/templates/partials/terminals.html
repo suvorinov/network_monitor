@@ -2,14 +2,14 @@
 <!-- === РЕЖИМ CLI (Компактная таблица) ====== -->
 <!-- ========================================== -->
 <div class="panel overflow-hidden">
-    <table class="w-full text-xs" id="cli-table" style="table-layout: fixed;">
+    <table class="w-full text-xs table-fixed" id="cli-table">
         {% include "partials/_head_table.html" %}
         <tbody id="cli-table-body">
         {% for pc in computers %}
             {% include "partials/_row_table.html" %}
         {% else %}
             <tr>
-                <td colspan="9" class="text-center p-8" style="color: var(--text-muted);">
+                <td colspan="9" class="text-center p-8 text-muted">
                     Нет данных для отображения
                 </td>
             </tr>
@@ -32,7 +32,7 @@
     </button>
     {% endif %}
 
-    <span style="color: var(--text-muted);">
+    <span class="text-muted">
         Page {{ page }} of {{ total_pages }}
     </span>
 

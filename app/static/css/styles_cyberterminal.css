@@ -86,6 +86,28 @@ body {
 .glow-blue { color: var(--neon_blue); text-shadow: 0 0 5px var(--neon_blue); }
 .glow-yellow { color: var(--neon_yellow); text-shadow: 0 0 5px var(--neon_yellow); }
 
+/* --- UTILITY CLASSES для замены inline-стилей --- */
+.text-muted { color: var(--text-muted); }
+.text-main { color: var(--text-main); }
+.text-accent { color: var(--accent-green); }
+.text-neon-red { color: var(--neon_red); }
+.border-color { border-color: var(--border-color); }
+.border-accent { border-color: var(--accent-green-dim); }
+.bg-panel { background-color: var(--bg-panel); }
+.bg-terminal { background-color: var(--bg-terminal); }
+.bg-accent-dim { background-color: var(--accent-green-dim); }
+.modal-backdrop {
+    background-color: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+.font-mono { font-family: var(--font-mono); }
+.border-bottom-color { border-bottom: 1px solid var(--border-color); }
+.hover-bg-dim:hover { background-color: rgba(255,255,255,0.05); }
+.text-neon-blue { color: var(--neon_blue); }
+.bg-neon-blue-dim { background-color: rgba(0, 212, 255, 0.1); }
+.border-bottom-terminal { border-bottom: 1px solid var(--border-color); }
+
 /* Мигающий курсор */
 .cursor-blink::after {
     content: '▋';

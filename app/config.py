@@ -6,8 +6,12 @@ class Settings(BaseSettings):
 
     DB_PATH: str = "monitor.db"
     SECRET_KEY: str = "your-secret-key-here"
-    # Порог времени: если от компьютера нет данных больше 3 минут, он Offline
     OFFLINE_THRESHOLD_MINUTES: int = 3
+
+    CPU_WARN_THRESHOLD: int = 80
+    RAM_WARN_THRESHOLD: int = 80
+    DISK_WARN_THRESHOLD: int = 90
+    SWAP_WARN_THRESHOLD: int = 80
 
 
 settings = Settings()

@@ -24,10 +24,10 @@
 
 <!-- Сетка терминалов -->
 <div id="terminal-list" class="flex flex-col gap-2"
-     hx-get="/htmx/terminals" hx-trigger="load, every 10s" hx-swap="innerHTML"
+     hx-get="/htmx/terminals" hx-trigger="load, every 30m" hx-swap="innerHTML"
      hx-vals='{"page": "1", "status": "ALL", "q": ""}'
      hx-indicator="#loading-spinner">
-    <div class="text-sm" style="color: var(--text-muted)">
+    <div class="text-sm text-muted">
         Инициализация сканера сети...
     </div>
 </div>

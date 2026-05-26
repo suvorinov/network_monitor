@@ -38,6 +38,34 @@ python agent/agent.py
 
 Настройки агента — в `agent/config.ini` (URL сервера, интервал опроса).
 
+## Сборка агента (PyInstaller)
+
+Собирает `agent/MonitorAgent.spec` в исполняемый файл без зависимостей.
+
+### Linux
+
+```bash
+pip install pyinstaller
+pyinstaller agent/MonitorAgent.spec
+# Результат: dist/MonitorAgent/MonitorAgent
+```
+
+> Для однофайлового бинарника без `dist/` папки: `pyinstaller --onefile agent/MonitorAgent.spec`
+
+### Windows
+
+Сборка выполняется **на Windows** (кросс-компиляция не поддерживается).
+
+```cmd
+pip install pyinstaller
+pyinstaller agent/MonitorAgent.spec
+:: Результат: dist\MonitorAgent\MonitorAgent.exe
+```
+
+Параметры `MonitorAgent.spec`:
+- `console=false` — скрывает окно консоли (фоновый процесс)
+- `upx=true` — сжатие UPX (требуется `upx.exe` в `PATH`)
+
 ## Docker
 
 ```bash

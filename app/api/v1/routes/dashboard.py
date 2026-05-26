@@ -1,30 +1,35 @@
+import secrets
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi import Query
-from loguru import logger
 
 from app.models import Computer
 from app.dependencies import get_db
-from app.helpers import format_traffic, format_uptime
+from app.middleware import CSRF_COOKIE_NAME
+from app.helpers import format_computer
+from app.config import settings
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
+templates.env.globals["CPU_WARN"] = settings.CPU_WARN_THRESHOLD
+templates.env.globals["RAM_WARN"] = settings.RAM_WARN_THRESHOLD
+templates.env.globals["DISK_WARN"] = settings.DISK_WARN_THRESHOLD
+templates.env.globals["SWAP_WARN"] = settings.SWAP_WARN_THRESHOLD
 
 @router.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request, db: Session = Depends(get_db)):
-    """Рендерит главную страницу дашборда.
-    
-    Args:
-        request (Request): Объект запроса FastAPI.
-        db (Session): Сессия базы данных.
-        
-    Returns:
-        TemplateResponse: HTML-страница дашборда.
-    """
+    """Рендерит главную страницу дашборда."""
     computers = db.query(Computer).all()
-    return templates.TemplateResponse(request, "dashboard.html", {"request": request, "computers": computers})
+    csrf_token = secrets.token_urlsafe(32)
+    resp = templates.TemplateResponse(request, "dashboard.html", {
+        "request": request,
+        "computers": computers,
+        "csrf_token": csrf_token
+    })
+    resp.set_cookie(key=CSRF_COOKIE_NAME, value=csrf_token, httponly=True, samesite="lax")
+    return resp
 
 @router.get("/htmx/terminals", response_class=HTMLResponse)
 async def htmx_terminals(
@@ -45,31 +50,7 @@ async def htmx_terminals(
         
     total_computers = query.count()
     computers = query.offset(offset).limit(limit).all()
-    # --- ДОБАВЛЕННАЯ ОБРАБОТКА ---
-    # Создаем список словарей с отформатированными данными
-    formatted_computers = []
-    for pc in computers:
-        pc_dict = {
-            "id": pc.id,
-            "hostname": pc.hostname,
-            "ip_address": pc.ip_address,
-            "os_name": pc.os_name,
-            "current_user": pc.current_user,
-            "status": pc.status,
-            "last_seen": pc.last_seen,
-            "cpu_percent": pc.cpu_percent,
-            "ram_percent": pc.ram_percent,
-            "disk_percent": pc.disk_percent,
-            "disk_total_gb": pc.disk_total_gb,
-            "disk_free_gb": pc.disk_free_gb,
-            "process_count": pc.process_count,
-            "swap_percent": pc.swap_percent,
-            # Форматируем сырые данные!
-            "uptime_formatted": format_uptime(pc.uptime_seconds),
-            "net_down_formatted": format_traffic(pc.bytes_recv_mb),
-            "net_up_formatted": format_traffic(pc.bytes_sent_mb),
-        }
-        formatted_computers.append(pc_dict)
+    formatted_computers = [format_computer(pc) for pc in computers]
 
     context = {
         "request": request, 
@@ -89,27 +70,8 @@ async def get_host_card(request: Request, hostname: str, db: Session = Depends(g
     if not pc:
         return HTMLResponse("<div class='p-4 text-red-500'>Хост не найден</div>")
     
-    # Форматируем данные (используем те же хелперы)
     context = {
         "request": request,
-        "pc": {
-            "hostname": pc.hostname,
-            "ip_address": pc.ip_address,
-            "os_name": pc.os_name,
-            "current_user": pc.current_user,
-            "status": pc.status,
-            "last_seen": pc.last_seen,
-            "cpu_percent": pc.cpu_percent,
-            "ram_percent": pc.ram_percent,
-            "disk_percent": pc.disk_percent,
-            "disk_total_gb": pc.disk_total_gb,
-            "disk_free_gb": pc.disk_free_gb,
-            "process_count": pc.process_count,
-            "swap_percent": pc.swap_percent,
-            "uptime_formatted": format_uptime(pc.uptime_seconds),
-            "net_down_formatted": format_traffic(pc.bytes_recv_mb),
-            "net_up_formatted": format_traffic(pc.bytes_sent_mb),
-        }
+        "pc": format_computer(pc),
     }
-    logger.info(hostname)
     return templates.TemplateResponse(request, "partials/_card.html", context)
