@@ -10,6 +10,8 @@ def format_computer(pc):
         "last_seen": pc.last_seen,
         "cpu_percent": pc.cpu_percent,
         "ram_percent": pc.ram_percent,
+        "ram_total_gb": pc.ram_total_gb,
+        "ram_available_gb": pc.ram_available_gb,
         "disk_percent": pc.disk_percent,
         "disk_total_gb": pc.disk_total_gb,
         "disk_free_gb": pc.disk_free_gb,

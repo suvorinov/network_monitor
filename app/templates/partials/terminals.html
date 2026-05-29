@@ -47,4 +47,6 @@
 </div>
 {% endif %}
 
-<!-- Счётчики обновляются автоматически через App.updateCounters (htmx:afterSettle) -->
+<span id="counter-total" class="hidden">{{ total_all }}</span>
+<span id="counter-online" class="hidden">{{ online_all }}</span>
+<span id="counter-offline" class="hidden">{{ offline_all }}</span>

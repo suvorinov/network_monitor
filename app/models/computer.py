@@ -16,6 +16,8 @@ class Computer(Base):
     
     cpu_percent = Column(Float, default=0)
     ram_percent = Column(Float, default=0)
+    ram_total_gb = Column(Float, default=0)
+    ram_available_gb = Column(Float, default=0)
     
     disk_percent = Column(Float, default=0)
     disk_total_gb = Column(Float, default=0)

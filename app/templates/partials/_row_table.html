@@ -12,12 +12,12 @@
     onclick="App.openHostModal('{{ pc.hostname|lower|e }}')">
 
     <!-- HOSTNAME -->
-    <td class="text-left p-3 w-[15%] truncate font-bold text-accent">
+    <td class="text-left p-3 w-[10%] truncate font-bold text-accent">
         {{ pc.hostname }}
     </td>
     
     <!-- USER -->
-    <td class="text-left p-3 w-[10%] truncate font-bold glow-blue">
+    <td class="text-left p-3 w-[15%] truncate font-bold glow-blue">
         {{ pc.current_user }}
     </td>
     
@@ -50,7 +50,12 @@
             <div class="w-10 h-1.5 rounded-full flex-shrink-0 bg-terminal">
                 <div class="h-1.5 rounded-full" style="width: {{ pc.ram_percent }}%; background-color: {{ '#f85149' if pc.ram_percent > RAM_WARN else 'var(--neon_blue)' }};"></div>
             </div>
-            <span class="w-9 text-right flex-shrink-0 {{ 'glow-red' if pc.ram_percent > RAM_WARN else '' }}">{{ pc.ram_percent }}%</span>
+            <div class="text-right flex-shrink-0">
+                <div class="{{ 'glow-red' if pc.ram_percent > RAM_WARN else '' }}">{{ pc.ram_percent }}%</div>
+                <!--
+                <div class="text-[9px] text-muted">{{ pc.ram_available_gb }} Gb</div>
+                -->
+            </div>
         </div>
     </td>
     

@@ -33,7 +33,9 @@
         <div>
             <div class="flex justify-between mb-1">
                 <span class="text-muted"><i class="fa-solid fa-memory w-4"></i> RAM</span>
-                <span class="{{ 'glow-red' if pc.ram_percent > RAM_WARN else '' }}">{{ pc.ram_percent }}%</span>
+                <span class="{{ 'glow-red' if pc.ram_percent > RAM_WARN else '' }}">
+                    {{ pc.ram_percent }}% <span class="text-muted font-normal">({{ pc.ram_available_gb }}/{{ pc.ram_total_gb }} Gb)</span>
+                </span>
             </div>
             <div class="progress-track">
                 <div class="progress-bar" style="width: {{ pc.ram_percent }}%; background-color: {{ '#f85149' if pc.ram_percent > RAM_WARN else 'var(--neon_blue)' }};"></div>

@@ -14,7 +14,7 @@ from typing import Optional, Tuple
 
 
 # === КОНСТАНТЫ ===
-AGENT_VERSION = "1.0.0"
+AGENT_VERSION = "1.0.1"
 DEFAULT_SERVER_URL = "http://192.168.0.9:8900/api/v1/metrics"
 DEFAULT_POLL_INTERVAL = 60
 MUTEX_NAME = "Global\\CyberMonitorAgentSingleInstance"
@@ -165,13 +165,17 @@ def get_system_metrics() -> Optional[dict]:
         net_sent_mb = round(net_io.bytes_sent / (1024 ** 2), 2)
         net_recv_mb = round(net_io.bytes_recv / (1024 ** 2), 2)
 
+        mem = psutil.virtual_memory()
+
         return {
             "hostname": hostname,
             "ip_address": ip_address,
             "os_name": platform.system(),
             "current_user": current_user,
             "cpu_percent": psutil.cpu_percent(),
-            "ram_percent": psutil.virtual_memory().percent,
+            "ram_percent": mem.percent,
+            "ram_total_gb": round(mem.total / (1024 ** 3), 2),
+            "ram_available_gb": round(mem.available / (1024 ** 3), 2),
             "disk_percent": disk_usage.percent,
             "disk_total_gb": round(disk_usage.total / (1024 ** 3), 2),
             "disk_free_gb": round(disk_usage.free / (1024 ** 3), 2),

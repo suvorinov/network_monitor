@@ -9,6 +9,8 @@ class AgentMetrics(BaseModel):
     current_user: Optional[str] = "Unknown" # <--- НОВОЕ ПОЛЕ
     cpu_percent: float = 0
     ram_percent: float = 0
+    ram_total_gb: Optional[float] = 0
+    ram_available_gb: Optional[float] = 0
     disk_percent: float = 0
     disk_total_gb: Optional[float] = 0
     disk_free_gb: Optional[float] = 0

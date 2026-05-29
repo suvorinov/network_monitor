@@ -23,10 +23,10 @@ help:
 	@echo "  clean         - Удалить все неиспользуемые образы, сети, тома и т.д."
 
 css:
-	tailwindcss --input app/static/css/tailwind.css --output app/static/css/output.css --minify
+	./tailwindcss --input app/static/css/tailwind.css --output app/static/css/output.css --minify
 
 css-watch:
-	tailwindcss --input app/static/css/tailwind.css --output app/static/css/output.css --minify --watch
+	./tailwindcss --input app/static/css/tailwind.css --output app/static/css/output.css --minify --watch
 
 build: css
 	docker-compose build

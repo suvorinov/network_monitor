@@ -9,6 +9,7 @@ from loguru import logger
 from app.dependencies import get_db
 from app.models import Computer
 from app.schemas import AgentMetrics
+from app.config import settings
 
 router = APIRouter()
 
@@ -18,9 +19,9 @@ def receive_metrics(metrics: AgentMetrics, db: Session = Depends(get_db)):
     db_computer = db.query(Computer).filter(Computer.hostname == metrics.hostname).first()
     
     # Логика алертов
-    if metrics.cpu_percent > 90:
+    if metrics.cpu_percent > settings.CPU_WARN_THRESHOLD:
         logger.warning(f"ALERT [{metrics.hostname}]: Высокая загрузка CPU - {metrics.cpu_percent}%")
-    if metrics.disk_percent > 90:
+    if metrics.disk_percent > settings.DISK_WARN_THRESHOLD:
         logger.warning(f"ALERT [{metrics.hostname}]: Заканчивается место на диске - {metrics.disk_percent}%")
     
     # Общий словарь данных для обновления
@@ -30,6 +31,8 @@ def receive_metrics(metrics: AgentMetrics, db: Session = Depends(get_db)):
         "current_user": metrics.current_user,
         "cpu_percent": metrics.cpu_percent,
         "ram_percent": metrics.ram_percent,
+        "ram_total_gb": metrics.ram_total_gb,
+        "ram_available_gb": metrics.ram_available_gb,
         "disk_percent": metrics.disk_percent,
         "disk_total_gb": metrics.disk_total_gb,
         "disk_free_gb": metrics.disk_free_gb,

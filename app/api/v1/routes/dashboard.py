@@ -39,7 +39,7 @@ async def htmx_terminals(
     status: str = Query("ALL"),
     page: int = Query(1),
 ):
-    limit = 18
+    limit = 100
     offset = (page - 1) * limit
     
     query = db.query(Computer)
@@ -52,11 +52,18 @@ async def htmx_terminals(
     computers = query.offset(offset).limit(limit).all()
     formatted_computers = [format_computer(pc) for pc in computers]
 
+    total_all = db.query(Computer).count()
+    online_all = db.query(Computer).filter(Computer.status == "ONLINE").count()
+    offline_all = db.query(Computer).filter(Computer.status == "OFFLINE").count()
+
     context = {
         "request": request, 
         "computers": formatted_computers, 
         "page": page, 
         "total_pages": (total_computers + limit - 1) // limit,
+        "total_all": total_all,
+        "online_all": online_all,
+        "offline_all": offline_all,
     }
     
     return templates.TemplateResponse(request, "partials/terminals.html", context)

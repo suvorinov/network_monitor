@@ -81,15 +81,20 @@ App.sortTable = function (table, sortKey, type, asc) {
 };
 
 App.updateCounters = function () {
-    let online = 0, offline = 0;
-    document.querySelectorAll('#cli-table tbody tr[data-status]').forEach(tr => {
-        if (tr.dataset.status === 'ONLINE') online++;
-        else offline++;
-    });
+    const totalEl = document.getElementById('counter-total');
+    const onlineEl = document.getElementById('counter-online');
+    const offlineEl = document.getElementById('counter-offline');
     const nodeCountEl = document.getElementById('node-count');
+    const onlineCountEl = document.getElementById('online-count');
     const offlineCountEl = document.getElementById('offline-count');
     const incidentBadge = document.getElementById('incident-badge');
-    if (nodeCountEl) nodeCountEl.innerText = online;
+
+    const total = totalEl ? parseInt(totalEl.textContent) : 0;
+    const online = onlineEl ? parseInt(onlineEl.textContent) : 0;
+    const offline = offlineEl ? parseInt(offlineEl.textContent) : 0;
+
+    if (nodeCountEl) nodeCountEl.innerText = total;
+    if (onlineCountEl) onlineCountEl.innerText = online;
     if (offlineCountEl) offlineCountEl.innerText = offline;
     if (incidentBadge) {
         if (offline > 0) {

@@ -12,7 +12,6 @@ const App = {
         this.initHTMXErrorHandler();
         this.initFilters();
         this.initSorting();
-        this.initPolling();
         this.loadSettings();
     },
 
@@ -52,16 +51,9 @@ const App = {
         });
     },
 
-    initPolling() {
-        const list = document.getElementById('terminal-list');
-        if (list) {
-            list.setAttribute('hx-trigger', 'load');
-        }
-    },
-
     restartPollingTimer() {
         if (this.state.pollingTimer) clearInterval(this.state.pollingTimer);
-        this.state.pollingTimer = setInterval(() => {
+        const poll = () => {
             const activeFilter = document.querySelector('.status-filter.active');
             const searchInput = document.getElementById('search-input');
             const status = activeFilter?.dataset?.filter || 'ALL';
@@ -72,7 +64,9 @@ const App = {
                 indicator: '#loading-spinner',
                 values: { page: 1, status, q }
             });
-        }, this.state.pollingInterval * 1000);
+        };
+        poll();
+        this.state.pollingTimer = setInterval(poll, this.state.pollingInterval * 1000);
     },
 
     setPollingInterval(seconds) {
