@@ -1,0 +1,1 @@
+wget --timeout=60 --tries=3 "https://github.com/tailwindlabs/tailwindcss/releases/download/v4.3.0/tailwindcss-linux-x64" -O tailwindcss 2>&1 tail -3
