@@ -179,3 +179,4 @@ pyrightconfig.json
 *.pid
 *.log
 tailwindcss
+download_tailwindcss.sh
