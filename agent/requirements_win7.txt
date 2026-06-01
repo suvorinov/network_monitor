@@ -1,0 +1,4 @@
+pyinstaller
+psutil==5.9.8
+requests
+loguru

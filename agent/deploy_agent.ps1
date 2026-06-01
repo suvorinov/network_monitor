@@ -54,7 +54,7 @@ function Deploy-Computer {
 
     try {
         Get-WmiObject -ComputerName $Computer -Query "SELECT * FROM Win32_Process WHERE Name='CyberAgent.exe'" |
-            ForEach-Object { $_.Terminate() }
+            ForEach-Object { $null = $_.Terminate() }
         Start-Sleep 1
     } catch {
         Write-Log "Process terminate warning: $_" -Level "WARN" -Computer $Computer
@@ -72,14 +72,13 @@ function Deploy-Computer {
     }
 
     try {
-        $Result = ([wmiclass]"\\$Computer\root\cimv2:Win32_Process").Create(
-            "$Target\CyberAgent.exe"
-        )
+        $Result = ([wmiclass]"\\$Computer\root\cimv2:Win32_Process").Create("$Target\CyberAgent.exe")
         if ($Result.ReturnValue -eq 0) {
             Write-Log "CyberAgent.exe started" -Computer $Computer
         } else {
             Write-Log "Process start failed (code: $($Result.ReturnValue))" -Level "ERROR" -Computer $Computer
         }
+        $null = $Result
     } catch {
         Write-Log "WMI start error: $_" -Level "ERROR" -Computer $Computer
     }
